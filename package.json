@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsnd -r dotenv/config -r tsconfig-paths/register --transpile-only --rs --respawn --ignore-watch node_modules src/server.ts"
   },
   "keywords": [],
   "author": "",
