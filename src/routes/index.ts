@@ -1,6 +1,10 @@
-// import AuthRoutes from "../modules/auth/auth.routes";
+import { Router } from 'express';
 
-// export default [
-//     AuthRoutes,
-// ];
-  
+const router = Router();
+
+// Defina suas rotas aqui
+router.get('/example', (req, res) => {
+  res.send('Example route');
+});
+
+export default router;
