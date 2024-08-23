@@ -5,7 +5,7 @@ export namespace AppAccountService {
     
     export namespace GetAllAccountDTO {
         export type Args = GetAllArgs<Account>
-        export type Result = TRows<Account>;
+        export type Result = TRows<Account | IError>;
         export type Handler = ServiceFn<Args, Promise<Result>>;
     }
 

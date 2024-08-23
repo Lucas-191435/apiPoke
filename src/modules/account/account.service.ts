@@ -1,27 +1,9 @@
-
-
-interface ICreateAccountDTO {
-    email: string;
-    name: string;
-}
-
-interface IAccountDocument {
-    id: string;
-    email: string;
-    name: string | null;
-}
-
-interface IAccountService {
-    store(data: ICreateAccountDTO): Promise<IAccountDocument | null>;
-}
-
 import { Prisma } from '@prisma/client';
 import prismaClient from '../../database/index'
-import { GetAllArgs } from 'src/types/generics';
 import { AppAccountService } from 'src/interfaces/IAccountService';
 
 class AccountService implements AppAccountService.IAccountService {
-    create: AppAccountService.Create.Handler = async({
+    create: AppAccountService.Create.Handler = async ({
         data
     }) => {
         try {
@@ -38,7 +20,7 @@ class AccountService implements AppAccountService.IAccountService {
                 if (error.code === 'P2002' && error.meta?.target === 'Account_email_key') {
                     throw {
                         message: 'Já existe uma conta com esse email!',
-                        statusCode: 409, // HTTP 409 Conflict
+                        statusCode: 409,
                     };
                 }
             }
@@ -56,23 +38,33 @@ class AccountService implements AppAccountService.IAccountService {
         pageSize,
         query,
     }) => {
-        const { } = JSON.parse(query);
+        try {
+            const { } = JSON.parse(query);
 
-        const conditions: Array<Record<string, any>> = [];
-        const where: Prisma.AccountFindManyArgs["where"] = {
-            AND: conditions.length > 0 ? conditions : undefined,
-        };
+            const conditions: Array<Record<string, any>> = [];
+            const where: Prisma.AccountFindManyArgs["where"] = {
+                AND: conditions.length > 0 ? conditions : undefined,
+            };
 
-        const count = await prismaClient.account.count({ where });
-        const accounts = await prismaClient.account.findMany({
-            where: {},
-        })
+            const count = await prismaClient.account.count({ where });
+            const accounts = await prismaClient.account.findMany({
+                where: {},
+            })
 
-        return {
-            count,
-            rows: accounts,
-            pageSize,
-            page,
+            return {
+                count,
+                rows: accounts,
+                pageSize,
+                page,
+            }
+
+        } catch (error) {
+
+            throw {
+                message: 'Falhou pegar contas',
+                statusCode: 500,
+                details: error,
+            };
         }
     }
 
