@@ -28,6 +28,6 @@ model Post {
 
 model Account {
   id    String     @id @default(uuid())
-  email String  @unique
+  email String     @unique
   name  String?
 }

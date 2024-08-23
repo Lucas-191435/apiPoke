@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 import { Environment } from "../utils/Environment";
-import { Eazy } from "../types/Eazy";
+// import { Eazy } from "../types/Eazy";
 
 class EazyProvider {
   public instance: AxiosInstance;
