@@ -17,56 +17,62 @@ interface IAccountService {
 
 import { Prisma } from '@prisma/client';
 import prismaClient from '../../database/index'
+import { GetAllArgs } from 'src/types/generics';
+import { AppAccountService } from 'src/interfaces/IAccountService';
 
-class AccountService implements IAccountService {
-    async store({
-        name,
-        email
-    }: ICreateAccountDTO): Promise<IAccountDocument | null> {
+class AccountService implements AppAccountService.IAccountService {
+    create: AppAccountService.Create.Handler = async({
+        data
+    }) => {
         try {
-
-            const user = await prismaClient.account.create({
+            const { name, email } = data;
+            const account = await prismaClient.account.create({
                 data: {
                     name,
-                    email
+                    email,
                 },
-            })
+            });
+            return account;
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                if (error.code === 'P2002' && error.meta?.target === 'Account_email_key') {
+                    throw {
+                        message: 'Já existe uma conta com esse email!',
+                        statusCode: 409, // HTTP 409 Conflict
+                    };
+                }
+            }
 
-            return user || null;
-        } catch (e: any) {
-
-            return null;
+            throw {
+                message: 'Falhou ao criar a conta!',
+                statusCode: 500,
+                details: error,
+            };
         }
     }
 
-    async findAndCountAll({
+    findAndCountAll: AppAccountService.GetAllAccountDTO.Handler = async ({
         page,
         pageSize,
         query,
-    }: any): Promise<any | null> {
-        try {
-            const {} = JSON.parse(query);
+    }) => {
+        const { } = JSON.parse(query);
 
-            const conditions: Array<Record<string, any>> = [];
-            const where: Prisma.AccountFindManyArgs["where"] = {
-                AND: conditions.length > 0 ? conditions : undefined,
-              };
+        const conditions: Array<Record<string, any>> = [];
+        const where: Prisma.AccountFindManyArgs["where"] = {
+            AND: conditions.length > 0 ? conditions : undefined,
+        };
 
-            const count = await prismaClient.account.count({ where });
+        const count = await prismaClient.account.count({ where });
+        const accounts = await prismaClient.account.findMany({
+            where: {},
+        })
 
-            const accounts = await prismaClient.account.findMany({
-                where: {},
-            })
-
-            return {
-                count,
-                rows: accounts,
-                pageSize: +pageSize || 5,
-                page: +page || 0,
-              }
-        } catch (e: any) {
-            console.log(e)
-            return null;
+        return {
+            count,
+            rows: accounts,
+            pageSize,
+            page,
         }
     }
 

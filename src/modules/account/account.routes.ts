@@ -6,7 +6,7 @@ const accountController = new AccountController();
 
 routes.post(
     '/account',
-    (req: Request, res: Response) => accountController.store(req, res),
+    (req: Request, res: Response) => accountController.create(req, res),
   )
 
   routes.get(
