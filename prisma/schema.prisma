@@ -25,9 +25,100 @@ model Post {
   author    User    @relation(fields: [authorId], references: [id])
   authorId  Int
 }
-
 model Account {
-  id    String     @id @default(uuid())
-  email String     @unique
-  name  String?
+  id                   Int              @id @default(autoincrement())
+  name                 String
+  document             String
+  addresses            AccountAddress[]
+  phones               AccountPhone[]
+  application_id       Int
+  status               Int
+  status_name          String
+  account_id           Int
+  customer_id          Int
+  entity_id            Int
+  program_id           Int
+  program              Program          @relation(fields: [program_id], references: [id])
+  due_date_id          Int
+  due_date_day         Int
+  isCurrentlyPEP       Boolean?         @default(false)
+  isCurrentlySanctioned Boolean?        @default(false)
+  lastDataCorpUpdate   DateTime?
+  max_credit_limit     Float
+  total_credit_limit   Float
+  accrual_status       String?
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+  
+  organizationId       Int
+}
+
+model AccountPhone {
+  id           String  @id @default(uuid())
+  phone        String  @unique
+  phone_type   String
+  country_code String
+  area_code    Int
+  active       Boolean
+  account      Account? @relation(fields: [accountId], references: [id])
+
+  accountId    Int?
+}
+
+model AccountAddress {
+  id                    String  @id @default(uuid())
+  address               String
+  number                Int
+  country_code          String
+  country               String
+  neighborhood          String
+  city                  String
+  state                 String
+  zip_code              String
+  address_type          String
+  complementary_address String
+  mailing_address       Boolean
+  active                Boolean
+  account               Account? @relation(fields: [accountId], references: [id])
+
+  accountId             Int?
+}
+model Program {
+  id                    Int        @id @default(autoincrement())
+  name                  String
+  is_active             Boolean
+  program_id            Int
+  globalLimit           Float
+  hiveClientId          String?      
+  isPrepaid             Boolean?   @default(false)
+  totalCardsPerAccount  Int
+  due_dates             DueDate[]
+  bin                   Bin?       @relation(fields: [binId], references: [id])
+  brand                 String
+  timezone              String
+  logo                  String?
+  currency_numeric_code String
+  country_code          String
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+
+  binId                 Int?       
+  accounts              Account[]  
+}
+
+model Bin {
+  id           Int      @id @default(autoincrement())
+  start_range  String
+  end_range    String
+  value        String
+
+  programs     Program[]  
+}
+
+model DueDate {
+  id           Int      @id @default(autoincrement())
+  day          Int
+  active       Boolean
+  programId    Int
+  program      Program  @relation(fields: [programId], references: [id])
 }
