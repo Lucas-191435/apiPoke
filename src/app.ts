@@ -5,7 +5,16 @@ import routes from './routes'
 
 const app = express()
 
-app.use(cors())
+app.use(cors({
+  origin: [
+    "https://digitaleazy.dev.br",
+    "https://backoffice-hml.digitaleazy.dev.br",
+    "https://backoffice-prod.digitaleazy.dev.br",
+    "https://api-prod.digitaleazy.dev.br",
+    "https://api-hml.digitaleazy.dev.br"
+  ],
+}))
+
 app.use(json())
 app.use(urlencoded({ extended: true }))
 

@@ -14,5 +14,20 @@ routes.post(
     (req: Request, res: Response) => accountController.index(req, res),
   )
 
+  routes.get(
+    '/accountByDocument',
+    (req: Request, res: Response) => accountController.accountByDocument(req, res),
+  )
+
+  routes.post(
+    '/loginAccountFistStep',
+    (req: Request, res: Response) => accountController.loginAccountFistStep(req, res),
+  )
+
+  routes.post(
+    '/loginAccountSecondStep',
+    (req: Request, res: Response) => accountController.loginAccountSecondStep(req, res),
+  )
+
 
 export default routes;

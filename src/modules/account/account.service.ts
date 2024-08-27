@@ -1,25 +1,34 @@
 import { Prisma } from '@prisma/client';
 import prismaClient from '../../database/index'
 import { AppAccountService } from 'src/interfaces/IAccountService';
+import { whatsApiClient } from 'src/services/whatsAppAPI';
+import axios from 'axios';
+import { JsonWebTokenError, sign } from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
+import { generateCode } from 'src/utils/helpers';
 
+JsonWebTokenError
 class AccountService implements AppAccountService.IAccountService {
     create: AppAccountService.Create.Handler = async ({
         data
     }) => {
         try {
-            const { name, email } = data;
+            const { name,
+                document,
+            } = data;
             const account = await prismaClient.account.create({
                 data: {
                     name,
-                    email,
+                    document,
+                    organizationId: 'aa'
                 },
             });
             return account;
         } catch (error) {
             if (error instanceof Prisma.PrismaClientKnownRequestError) {
-                if (error.code === 'P2002' && error.meta?.target === 'Account_email_key') {
+                if (error.code === 'P2002' && error.meta?.target === 'Account_document_key') {
                     throw {
-                        message: 'Já existe uma conta com esse email!',
+                        message: 'Já existe uma conta com esse documento!',
                         statusCode: 409,
                     };
                 }
@@ -49,6 +58,12 @@ class AccountService implements AppAccountService.IAccountService {
             const count = await prismaClient.account.count({ where });
             const accounts = await prismaClient.account.findMany({
                 where: {},
+                select: {
+                    id: true,
+                    document: true,
+                    name: true,
+                    createdAt: true,
+                }
             })
 
             return {
@@ -62,6 +77,98 @@ class AccountService implements AppAccountService.IAccountService {
 
             throw {
                 message: 'Falhou pegar contas',
+                statusCode: 500,
+                details: error,
+            };
+        }
+    }
+
+
+    findByDocument: AppAccountService.FindByDocument.Handler = async (document) => {
+        try {
+            const account = await prismaClient.account.findFirst({ where: { document } })
+
+            return account;
+        } catch (error) {
+            throw {
+                message: 'Falhou pegar contas',
+                statusCode: 500,
+                details: error,
+            };
+        }
+    }
+
+    loginAccountFistStep: AppAccountService.LoginAccountFistStep.Handler = async (document) => {
+        try {
+            const account = await prismaClient.account.findFirst({
+                where: { document }, include: { phones: true }
+            })
+
+            if (!account) {
+                throw { message: 'Conta não encontrada', statusCode: 404, };
+            }
+
+            if (account.authCode && account.expiresAt && new Date() > account.expiresAt) {
+                const { authCode, expiresAt } = generateCode()
+
+                await prismaClient.account.update({
+                    where: { id: account.id },
+                    data: {
+                        authCode,
+                        expiresAt
+                    }
+                })
+            }
+
+            return {
+                name: account.name,
+                document: account.document,
+            };
+
+        } catch (error) {
+
+            throw {
+                message: 'Falhou pegar contas',
+                statusCode: 500,
+                details: error,
+            };
+        }
+    }
+
+    loginAccountSecondStep: AppAccountService.LoginAccountFistStep.Handler = async (authCode) => {
+        try {
+            const account = await prismaClient.account.findFirst({ where: { authCode } })
+
+            if (!account) {
+                throw { message: 'Conta não encontrada', statusCode: 404, };
+            }
+
+            if (account.expiresAt && new Date() > account.expiresAt) {
+                throw { message: 'Código expirado!', statusCode: 401, };
+            }
+
+            const token = sign({}, String(process.env.SECRET_KEY), {
+                subject: String(account.id),
+                expiresIn: "24h", // 12 hours
+                algorithm: "HS512",
+            });
+
+            await prismaClient.account.update({
+                where: { id: account.id },
+                data: {
+                    token,
+                }
+            })
+
+            return {
+                token,
+                id: account.id,
+                name: account.name,
+                document: account.document,
+            };
+        } catch (error) {
+            throw {
+                message: 'Falho etapa login!',
                 statusCode: 500,
                 details: error,
             };

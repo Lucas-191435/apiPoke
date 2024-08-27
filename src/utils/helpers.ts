@@ -11,7 +11,7 @@ import {
   import { unlink } from "fs";
   import { addMinutes, compareAsc } from "date-fns";
   import authConfig from "../config/authConfig";
-  
+  import { v4 as uuidv4  } from 'uuid';
   export const consoleColors = {
     Black: "\x1b[30m%s\x1b[0m",
     Red: "\x1b[31m%s\x1b[0m",
@@ -115,6 +115,23 @@ arr.join(", ").replace(/,\s([a-zA-Z0-9-]+)$/gm, " e $1");
   
     return StatusCodes.INTERNAL_SERVER_ERROR;
   };
+
+  export const generateCode = (): {
+    authCode: string;
+    expiresAt: Date;
+  } => {
+    const authCode = `${Math.floor(100000 + Math.random() * 900000).toString()}`;
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+    return {
+      authCode,
+      expiresAt,
+    };
+  }
+
+  export const verifyAuthCode = ({authCode, expiresAt}: {authCode: string, expiresAt: Date}): boolean => {
+
+    return !!(authCode && new Date() < expiresAt);
+  }
   
   export const generateToken = (
     params: string | object | Buffer,
