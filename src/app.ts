@@ -7,6 +7,7 @@ const app = express()
 
 app.use(cors({
   origin: [
+    "http://localhost:3000",
     "https://digitaleazy.dev.br",
     "https://backoffice-hml.digitaleazy.dev.br",
     "https://backoffice-prod.digitaleazy.dev.br",

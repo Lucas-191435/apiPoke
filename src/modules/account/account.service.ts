@@ -20,7 +20,6 @@ class AccountService implements AppAccountService.IAccountService {
                 data: {
                     name,
                     document,
-                    organizationId: 'aa'
                 },
             });
             return account;
@@ -100,13 +99,22 @@ class AccountService implements AppAccountService.IAccountService {
 
     loginAccountFistStep: AppAccountService.LoginAccountFistStep.Handler = async (document) => {
         try {
-            const account = await prismaClient.account.findFirst({
-                where: { document }, include: { phones: true }
+            if (!document) {
+                throw { message: 'Documento não fornecido', statusCode: 400 };
+            }
+            
+            const account = await prismaClient.account.findUnique({
+                where: { document: document }, include: { phones: true }
             })
 
             if (!account) {
                 throw { message: 'Conta não encontrada', statusCode: 404, };
             }
+
+            if (!account.status) {
+                throw { message: 'Conta não ativa', statusCode: 404, };
+            }
+
 
             if (account.authCode && account.expiresAt && new Date() > account.expiresAt) {
                 const { authCode, expiresAt } = generateCode()
@@ -118,6 +126,13 @@ class AccountService implements AppAccountService.IAccountService {
                         expiresAt
                     }
                 })
+
+                await whatsApiClient.post("/Whatsapp/Api", {
+                    code: account.phones[0].country_code,
+                    numero: account.phones[0].phone,
+                    text: 'Código de autenticação WebApp-Eazy: ' + authCode,
+                  }).then(response => console.log(response)).catch(err => console.log(err));
+
             }
 
             return {
@@ -126,7 +141,7 @@ class AccountService implements AppAccountService.IAccountService {
             };
 
         } catch (error) {
-
+            console.log(error);
             throw {
                 message: 'Falhou pegar contas',
                 statusCode: 500,
