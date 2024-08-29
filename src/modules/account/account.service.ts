@@ -105,7 +105,6 @@ class AccountService implements AppAccountService.IAccountService {
       if (!id) {
         throw { message: "Conta não fornecida!", statusCode: 400 };
       }
-      console.log("token: " + id);
       const account = await prismaClient.account.findFirst({ where: { id } });
 
       return account;
