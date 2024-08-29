@@ -6,6 +6,7 @@ import axios from "axios";
 import { JsonWebTokenError, sign } from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import { generateCode } from "../../utils/helpers";
+import { Mail } from "../../utils/Mail";
 
 JsonWebTokenError;
 class AccountService implements AppAccountService.IAccountService {
@@ -159,14 +160,22 @@ class AccountService implements AppAccountService.IAccountService {
             expiresAt,
           },
         });
-        await whatsApiClient
-          .post("/Whatsapp/Api", {
-            code: account.phones[0].country_code,
-            numero: account.phones[0].phone,
-            text: "Código de autenticação WebApp-Eazy: " + authCode,
-          })
-          .then((response) => console.log("---"))
-          .catch((err) => console.log(err));
+
+        const mail = new Mail()
+
+        await mail.sendEmail({
+          destination: "lucas.santos.mind@gmail.com",
+          subject: "Código de autenticação WebApp-Eazy",
+          htmlContent: "Código de autenticação WebApp-Eazy: " + authCode,
+        })
+        // await whatsApiClient
+        //   .post("/Whatsapp/Api", {
+        //     code: account.phones[0].country_code,
+        //     numero: account.phones[0].phone,
+        //     text: "Código de autenticação WebApp-Eazy: " + authCode,
+        //   })
+        //   .then((response) => console.log("---"))
+        //   .catch((err) => console.log(err));
       }
 
       return {
