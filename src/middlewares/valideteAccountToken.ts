@@ -1,7 +1,7 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request } from "express";
 import { verify } from "jsonwebtoken";
 
-import prismaClient from '../database/index'
+import prismaClient from "../database/index";
 
 interface IJwtPayload {
   iat: number;
@@ -28,11 +28,11 @@ const valideteAccountToken = async (
       String(process.env.SECRET_KEY)
     ) as IJwtPayload;
 
-    console.log('ai do user', id)
+    console.log("ai do user", id);
     const account = await prismaClient.account.findFirst({ where: { id } });
-    console.log('ai do document', account?.document)
+    console.log("ai do document", account?.document);
 
-    res.user = account?.id ;
+    res.user = account?.id;
 
     return next();
   } catch {
