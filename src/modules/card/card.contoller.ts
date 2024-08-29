@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import CardService from "./card.service";
-import { IError } from "src/types/generics";
+import { IError } from "../../types/generics";
 
 
 
