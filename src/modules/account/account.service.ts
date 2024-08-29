@@ -12,11 +12,12 @@ JsonWebTokenError;
 class AccountService implements AppAccountService.IAccountService {
   create: AppAccountService.Create.Handler = async ({ data }) => {
     try {
-      const { name, document } = data;
+      const { name, document, email } = data;
       const account = await prismaClient.account.create({
         data: {
           name,
           document,
+          email,
         },
       });
       return account;
@@ -143,8 +144,6 @@ class AccountService implements AppAccountService.IAccountService {
         throw { message: "Conta sem telefone", statusCode: 404 };
       }
 
-      console.log(account);
-
       if (
         account.authCode === null ||
         (account.authCode &&
@@ -160,11 +159,9 @@ class AccountService implements AppAccountService.IAccountService {
             expiresAt,
           },
         });
-
         const mail = new Mail()
-
         await mail.sendEmail({
-          destination: "lucas.santos.mind@gmail.com",
+          destination: account.email,
           subject: "Código de autenticação WebApp-Eazy",
           htmlContent: "Código de autenticação WebApp-Eazy: " + authCode,
         })

@@ -21,8 +21,7 @@ export namespace AppAccountService {
       data: {
         name: string;
         document: string;
-        limit: number;
-        programId: number;
+        email: string;
       };
       file?: any;
     };

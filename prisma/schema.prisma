@@ -43,13 +43,14 @@ model Account {
   id        String           @id @default(uuid())
   name      String
   document  String           @unique
+  email     String           @unique
   addresses AccountAddress[]
   phones    AccountPhone[]
   cards     Card[]
   customers Customer[]
   authCode  String?
   expiresAt DateTime?
-  
+
   application_id     Int?
   status             Boolean  @default(true)
   status_name        String?

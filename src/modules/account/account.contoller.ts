@@ -11,13 +11,7 @@ class AccountController {
 
   async create(req: Request, res: Response): Promise<Response> {
     try {
-      const data = {
-        name: "Teste create",
-        document: "50463750870",
-        limit: 1000,
-        programId: 10,
-      };
-
+      const data = req.body;
       const account = await this.accountService.create({
         data,
       });
