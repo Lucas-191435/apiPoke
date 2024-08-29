@@ -24,7 +24,7 @@ routes.post(
   routes.get(
     '/accountByToken',
     valideteAccountToken,
-    (req: Request, res: Response) => accountController.accountByDocument(req, res),
+    (req: Request, res: Response) => accountController.accountByToken(req, res),
   )
 
   routes.post(

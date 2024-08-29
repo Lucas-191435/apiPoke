@@ -85,6 +85,9 @@ class AccountService implements AppAccountService.IAccountService {
 
     findByDocument: AppAccountService.FindByDocument.Handler = async (document) => {
         try {
+            if (!document) {
+                throw { message: 'Documento não fornecido', statusCode: 400 };
+            }
             const account = await prismaClient.account.findFirst({ where: { document } })
 
             return account;
@@ -97,9 +100,13 @@ class AccountService implements AppAccountService.IAccountService {
         }
     }
 
-    findByToken: AppAccountService.FindByDocument.Handler = async (token) => {
+    findByToken: AppAccountService.FindByDocument.Handler = async (id) => {
         try {
-            const account = await prismaClient.account.findFirst({ where: { token } })
+            if (!id) {
+                throw { message: 'Conta não fornecida!', statusCode: 400 };
+            }
+            console.log('token: ' + id);
+            const account = await prismaClient.account.findFirst({ where: { id } })
 
             return account;
         } catch (error) {
@@ -129,8 +136,13 @@ class AccountService implements AppAccountService.IAccountService {
                 throw { message: 'Conta não ativa', statusCode: 404, };
             }
 
+            if (account.phones.length < 0) {
+                throw { message: 'Conta sem telefone', statusCode: 404, };
+            }
 
-            if (account.authCode && account.expiresAt && new Date() > account.expiresAt) {
+            console.log(account)
+
+            if (account.authCode === null || (account.authCode && account.expiresAt && new Date() > account.expiresAt)) {
                 const { authCode, expiresAt } = generateCode()
 
                 await prismaClient.account.update({
@@ -140,12 +152,11 @@ class AccountService implements AppAccountService.IAccountService {
                         expiresAt
                     }
                 })
-
                 await whatsApiClient.post("/Whatsapp/Api", {
                     code: account.phones[0].country_code,
                     numero: account.phones[0].phone,
                     text: 'Código de autenticação WebApp-Eazy: ' + authCode,
-                  }).then(response => console.log(response)).catch(err => console.log(err));
+                  }).then(response => console.log('---')).catch(err => console.log(err));
 
             }
 
@@ -181,13 +192,6 @@ class AccountService implements AppAccountService.IAccountService {
                 expiresIn: "24h", // 12 hours
                 algorithm: "HS512",
             });
-
-            await prismaClient.account.update({
-                where: { id: account.id },
-                data: {
-                    token,
-                }
-            })
 
             return {
                 token,

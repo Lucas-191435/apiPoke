@@ -20,7 +20,7 @@ enum CardStatus {
 
 enum CardType {
   PLASTIC
-  VIRTUAL 
+  VIRTUAL
 }
 
 model User {
@@ -49,10 +49,9 @@ model Account {
   customers Customer[]
   authCode  String?
   expiresAt DateTime?
-  token     String?
-
+  
   application_id     Int?
-  status             Boolean @default(true)
+  status             Boolean  @default(true)
   status_name        String?
   account_id         Int?
   customer_id        Int?
@@ -121,7 +120,7 @@ model DueDate {
 }
 
 model Card {
-  id                          String   @id @default(uuid())
+  id                          String    @id @default(uuid())
   name                        String
   type                        String
   status                      String

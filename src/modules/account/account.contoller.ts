@@ -15,7 +15,7 @@ class AccountController {
         try {
             const data = {
                 name: 'Teste create',
-                document: "35715862043",
+                document: "50463750870",
                 limit: 1000,
                 programId: 10,
             };
@@ -65,11 +65,11 @@ class AccountController {
         }
     }
 
-    async accountByToken(req: Request, res: Response): Promise<Response> {
+    async accountByToken(req: Request, res: any): Promise<Response> {
         try {
-            const { document } = req.query
+            const userId = res.user
 
-            let accounts = await this.accountService.findByToken(document as string)
+            let accounts = await this.accountService.findByToken(userId as string)
 
             return res.status(201).json({ message: "Contas", data: accounts });
         } catch (error) {
