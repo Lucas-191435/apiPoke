@@ -1,33 +1,22 @@
 import { Request, Response, Router, NextFunction } from 'express'
-import AccountController from './card.contoller'
+import CardController from './card.contoller'
 
 const routes = Router()
-const accountController = new AccountController();
+const cardController = new CardController();
 
 routes.post(
-    '/account',
-    (req: Request, res: Response) => accountController.create(req, res),
+    '/card',
+    (req: Request, res: Response) => cardController.create(req, res),
   )
 
-  routes.get(
-    '/account',
-    (req: Request, res: Response) => accountController.index(req, res),
-  )
+  // routes.get(
+  //   '/card',
+  //   (req: Request, res: Response) => cardController.index(req, res),
+  // )
 
-  routes.get(
-    '/accountByDocument',
-    (req: Request, res: Response) => accountController.accountByDocument(req, res),
-  )
-
-  routes.post(
-    '/loginAccountFistStep',
-    (req: Request, res: Response) => accountController.loginAccountFistStep(req, res),
-  )
-
-  routes.post(
-    '/loginAccountSecondStep',
-    (req: Request, res: Response) => accountController.loginAccountSecondStep(req, res),
-  )
-
+  // routes.get(
+  //   '/cardByDocument',
+  //   (req: Request, res: Response) => cardController.cardByDocument(req, res),
+  // )
 
 export default routes;

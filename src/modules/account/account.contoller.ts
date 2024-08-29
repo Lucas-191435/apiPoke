@@ -65,6 +65,19 @@ class AccountController {
         }
     }
 
+    async accountByToken(req: Request, res: Response): Promise<Response> {
+        try {
+            const { document } = req.query
+
+            let accounts = await this.accountService.findByToken(document as string)
+
+            return res.status(201).json({ message: "Contas", data: accounts });
+        } catch (error) {
+            const err = error as IError;
+            return res.status(err.statusCode || 500).json({ message: err.message, details: err.details });
+        }
+    }
+
 
     async loginAccountFistStep(req: Request, res: Response): Promise<Response> {
         try {

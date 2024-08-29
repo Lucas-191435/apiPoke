@@ -10,6 +10,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum CardStatus {
+  CREATED
+  UNBOUND
+  NORMAL
+  CANCELED
+  BLOCKED
+}
+
+enum CardType {
+  PLASTIC
+  VIRTUAL 
+}
+
 model User {
   id    Int     @id @default(autoincrement())
   email String  @unique
@@ -32,12 +45,14 @@ model Account {
   document  String           @unique
   addresses AccountAddress[]
   phones    AccountPhone[]
+  cards     Card[]
+  customers Customer[]
   authCode  String?
   expiresAt DateTime?
   token     String?
 
   application_id     Int?
-  status             Int?
+  status             Boolean @default(true)
   status_name        String?
   account_id         Int?
   customer_id        Int?
@@ -103,4 +118,46 @@ model DueDate {
   due_date_id Int
   programId   Int
   program     Program @relation(fields: [programId], references: [id])
+}
+
+model Card {
+  id                          String   @id @default(uuid())
+  name                        String
+  type                        String
+  status                      String
+  printed_name                String?
+  last_four_digits            String?
+  expiration_date             DateTime?
+  isDependentCard             Boolean?
+  isNoNameCard                Boolean?
+  bulkId                      String?
+  cvv_rotation_interval_hours Int?
+  transaction_limit           Float?
+  abu_enabled                 Boolean?
+  mode_type                   String?
+
+  logo                 String?
+  hasChangedPassword   Boolean?
+  lastNormalStatusDate DateTime?
+  trackingCode         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  account   Account? @relation(fields: [accountId], references: [id])
+  accountId String?
+
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
+}
+
+model Customer {
+  id        String   @id @default(uuid())
+  name      String
+  accountId String?
+  cards     Card[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  account Account? @relation(fields: [accountId], references: [id])
 }

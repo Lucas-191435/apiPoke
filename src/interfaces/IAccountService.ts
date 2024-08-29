@@ -59,6 +59,7 @@ export namespace AppAccountService {
         create: AppAccountService.Create.Handler;
         findByDocument: AppAccountService.FindByDocument.Handler;
         loginAccountFistStep: AppAccountService.LoginAccountFistStep.Handler;
+        loginAccountSecondStep: AppAccountService.LoginAccountSecondStep.Handler;
     }
 }
 

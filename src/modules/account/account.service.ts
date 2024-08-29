@@ -97,6 +97,20 @@ class AccountService implements AppAccountService.IAccountService {
         }
     }
 
+    findByToken: AppAccountService.FindByDocument.Handler = async (token) => {
+        try {
+            const account = await prismaClient.account.findFirst({ where: { token } })
+
+            return account;
+        } catch (error) {
+            throw {
+                message: 'Falhou pegar contas',
+                statusCode: 500,
+                details: error,
+            };
+        }
+    }
+
     loginAccountFistStep: AppAccountService.LoginAccountFistStep.Handler = async (document) => {
         try {
             if (!document) {
@@ -150,7 +164,7 @@ class AccountService implements AppAccountService.IAccountService {
         }
     }
 
-    loginAccountSecondStep: AppAccountService.LoginAccountFistStep.Handler = async (authCode) => {
+    loginAccountSecondStep: AppAccountService.LoginAccountSecondStep.Handler = async (authCode) => {
         try {
             const account = await prismaClient.account.findFirst({ where: { authCode } })
 

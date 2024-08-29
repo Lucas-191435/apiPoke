@@ -1,5 +1,7 @@
 import { Request, Response, Router, NextFunction } from 'express'
 import AccountController from './account.contoller'
+import { valideteAccountToken } from 'src/middlewares/valideteAccountToken';
+
 
 const routes = Router()
 const accountController = new AccountController();
@@ -16,6 +18,12 @@ routes.post(
 
   routes.get(
     '/accountByDocument',
+    (req: Request, res: Response) => accountController.accountByDocument(req, res),
+  )
+
+  routes.get(
+    '/accountByToken',
+    valideteAccountToken,
     (req: Request, res: Response) => accountController.accountByDocument(req, res),
   )
 
