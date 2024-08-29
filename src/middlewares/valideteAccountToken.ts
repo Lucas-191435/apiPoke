@@ -28,10 +28,7 @@ const valideteAccountToken = async (
       String(process.env.SECRET_KEY)
     ) as IJwtPayload;
 
-    console.log("ai do user", id);
     const account = await prismaClient.account.findFirst({ where: { id } });
-    console.log("ai do document", account?.document);
-
     res.user = account?.id;
 
     return next();
