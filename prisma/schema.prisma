@@ -121,10 +121,10 @@ model DueDate {
 }
 
 model Card {
-  id                          String    @id @default(uuid())
+  id                          String     @id @default(uuid())
   name                        String
-  type                        String
-  status                      String
+  type                        CardType   @default(VIRTUAL)
+  status                      CardStatus @default(CREATED)
   printed_name                String?
   last_four_digits            String?
   expiration_date             DateTime?

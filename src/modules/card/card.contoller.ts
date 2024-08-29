@@ -13,12 +13,7 @@ class CardController {
 
     async create(req: Request, res: Response): Promise<Response> {
         try {
-            const data = {
-                name: 'Teste create',
-                document: "35715862043",
-                limit: 1000,
-                programId: 10,
-            };
+            const data = req.body;
 
             const card = await this.cardService.create({
                 data
