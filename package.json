@@ -41,6 +41,8 @@
     "jsonwebtoken": "9.0.0",
     "multer": "1.4.5-lts.1",
     "nodemailer-express-handlebars": "6.1.0",
+    "cpf-cnpj-validator": "^1.0.3",
+    "yup": "^0.32.11",
     "uuid": "9.0.0"
   }
 }

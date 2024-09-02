@@ -10,12 +10,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AddressType {
+  RESIDENTIAL
+  COMMERCIAL
+  OTHER
+}
+
 enum CardStatus {
   CREATED
   UNBOUND
   NORMAL
   CANCELED
   BLOCKED
+}
+
+enum AuthorizationCategory {
+  AUTHORIZATION
+  DECLINED
+  CONFIRMATION
+  INSTALLMENT
+  CANCELLATION
 }
 
 enum CardType {
@@ -30,6 +44,19 @@ model User {
   posts Post[]
 }
 
+enum MaritalStatus {
+  SINGLE
+  MARRIED
+  DIVORCED
+  WIDOWER
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  NOTPROVIDED
+}
+
 model Post {
   id        Int     @id @default(autoincrement())
   title     String
@@ -40,32 +67,38 @@ model Post {
 }
 
 model Account {
-  id        String           @id @default(uuid())
-  name      String
-  document  String           @unique
-  email     String           @unique
-  addresses AccountAddress[]
-  phones    AccountPhone[]
-  cards     Card[]
-  customers Customer[]
+  //dados da conta 
+  id          String           @id @default(uuid())
+  name        String
+  document    String           @unique
+  email       String           @unique
+  addresses   AccountAddress[]
+  phones      AccountPhone[]
+  status      Boolean          @default(true)
+  status_name String?
+  Avatar      File?            @relation(fields: [avatarId], references: [id])
+  avatarId    String?
+  //dados auth 
   authCode  String?
   expiresAt DateTime?
 
+  cards     Card[]
+  customers Customer[]
+
   application_id     Int?
-  status             Boolean  @default(true)
-  status_name        String?
   account_id         Int?
   customer_id        Int?
   entity_id          Int?
   program_id         Int?
-  program            Program? @relation(fields: [program_id], references: [id])
   due_date_id        Int?
   due_date_day       Int?
-  max_credit_limit   Float?
-  total_credit_limit Float?
+  max_credit_limit   Float   @default(0)
+  total_credit_limit Float   @default(0)
   accrual_status     String?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+
+  program   Program? @relation(fields: [program_id], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model AccountPhone {
@@ -81,7 +114,7 @@ model AccountPhone {
 }
 
 model AccountAddress {
-  id                    String   @id @default(uuid())
+  id                    String      @id @default(uuid())
   address               String
   number                Int
   country_code          String
@@ -90,11 +123,11 @@ model AccountAddress {
   city                  String
   state                 String
   zip_code              String
-  address_type          String
+  address_type          AddressType @default(COMMERCIAL)
   complementary_address String?
   mailing_address       Boolean
   active                Boolean
-  account               Account? @relation(fields: [accountId], references: [id])
+  account               Account?    @relation(fields: [accountId], references: [id])
 
   accountId String?
 }
@@ -160,4 +193,20 @@ model Customer {
   updatedAt DateTime @updatedAt
 
   account Account? @relation(fields: [accountId], references: [id])
+}
+
+enum FileType {
+  Link
+  Attachment
+}
+
+model File {
+  id       String    @id @default(uuid())
+  name     String?
+  path     String?
+  url      String?
+  fileType FileType  @default(Attachment)
+  account  Account[]
+
+  @@map("files")
 }
