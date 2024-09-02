@@ -116,7 +116,6 @@ class AccountController {
     }
   }
 
-
   async testeInteracao(req: Request, res: Response): Promise<any> {
     try {
  
@@ -129,8 +128,6 @@ class AccountController {
         name: data.name,
       });
 
-      // console.log(account);
-
       return res.status(201).json({ message: "Conta", data: account });
     } catch (error) {
       const err = error as IError;
@@ -139,7 +136,6 @@ class AccountController {
         .json({ message: err.message, details: err.details });
     }
   }
-
 }
 
 export default AccountController;
