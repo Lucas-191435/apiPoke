@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
 import AccountService from "./account.service";
 import { IError } from "../../types/generics";
-
+import { EazyService } from "../eazy/eazy.service";
 class AccountController {
   private accountService: AccountService;
-
+  private eazyClient: EazyService;
   constructor() {
     this.accountService = new AccountService();
+    this.eazyClient = new EazyService();
   }
 
   async create(req: Request, res: Response): Promise<Response> {
@@ -114,6 +115,31 @@ class AccountController {
         .json({ message: err.message, details: err.details });
     }
   }
+
+
+  async testeInteracao(req: Request, res: Response): Promise<any> {
+    try {
+ 
+      const data = req.body;
+      console.log("testeInteracao",data)
+      const { account } = await this.eazyClient.createAccount({
+        document: data.cpf,
+        dueDateId: data.due_date_id,
+        limit: data.limit,
+        name: data.name,
+      });
+
+      // console.log(account);
+
+      return res.status(201).json({ message: "Conta", data: account });
+    } catch (error) {
+      const err = error as IError;
+      return res
+        .status(err.statusCode || 500)
+        .json({ message: err.message, details: err.details });
+    }
+  }
+
 }
 
 export default AccountController;

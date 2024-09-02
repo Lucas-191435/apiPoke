@@ -44,4 +44,9 @@ routes.post("/loginAccountSecondStep", (req: Request, res: Response) =>
   accountController.loginAccountSecondStep(req, res)
 );
 
+
+routes.post("/testeInteracao", (req: Request, res: Response) =>
+  accountController.testeInteracao(req, res)
+);
+
 export default routes;
