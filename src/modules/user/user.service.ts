@@ -66,30 +66,29 @@ class UserService implements AppUserService.IUserService {
           },
         })
 
-        const accountPhone = await prisma.accountPhone.create({
+        await prisma.accountPhone.create({
           data: {
             ...data.accountPhone,
             accountId: account.id, // Associa ao account
           },
         })
 
-        const accountAddress = await prisma.accountAddress.create({
+        await prisma.accountAddress.create({
           data: {
             ...data.accountAddress,
             accountId: account.id, // Associa ao account
           },
         })
 
-        return { user, account, card };
+        const updatedAccount = await prisma.account.update({
+          where: { id: account.id },
+          data: {
+            main_card_id: card.id, // Associa ao account
+          },
+        });
+
+        return { user, account: updatedAccount, card };
       });
-
-
-      await prismaClient.account.update({
-        where: { id: account.id },
-        data: {
-          main_card_id: card.id, // Associa ao account
-        },
-      })
 
       return user;
     } catch (error) {
