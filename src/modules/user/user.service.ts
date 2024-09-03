@@ -38,7 +38,7 @@ class UserService implements AppUserService.IUserService {
         
       //Caso uma operação de erro 
 
-      const { user, account } = await prismaClient.$transaction(async (prisma) => {
+      const { user, card, account } = await prismaClient.$transaction(async (prisma) => {
         const user = await prisma.user.create({
           data: {
             name,
@@ -83,6 +83,13 @@ class UserService implements AppUserService.IUserService {
         return { user, account, card };
       });
 
+
+      await prismaClient.account.update({
+        where: { id: account.id },
+        data: {
+          main_card_id: card.id, // Associa ao account
+        },
+      })
 
       return user;
     } catch (error) {
