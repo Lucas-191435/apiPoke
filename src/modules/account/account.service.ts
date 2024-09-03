@@ -13,11 +13,11 @@ class AccountService implements AppAccountService.IAccountService {
   create: AppAccountService.Create.Handler = async ({ data }) => {
     try {
       const { name, document, email } = data;
+
       const account = await prismaClient.account.create({
         data: {
           name,
           document,
-          email,
         },
       });
       return account;
@@ -101,129 +101,6 @@ class AccountService implements AppAccountService.IAccountService {
       };
     }
   };
-
-  findByToken: AppAccountService.FindByDocument.Handler = async (id) => {
-    try {
-      if (!id) {
-        throw { message: "Conta não fornecida!", statusCode: 400 };
-      }
-      const account = await prismaClient.account.findFirst({ where: { id } });
-
-      return account;
-    } catch (error) {
-      throw {
-        message: "Falhou pegar contas",
-        statusCode: 500,
-        details: error,
-      };
-    }
-  };
-
-  loginAccountFistStep: AppAccountService.LoginAccountFistStep.Handler = async (
-    document
-  ) => {
-    try {
-      if (!document) {
-        throw { message: "Documento não fornecido", statusCode: 400 };
-      }
-
-      const account = await prismaClient.account.findUnique({
-        where: { document: document },
-        include: { phones: true },
-      });
-
-      if (!account) {
-        throw { message: "Conta não encontrada", statusCode: 404 };
-      }
-
-      if (!account.status) {
-        throw { message: "Conta não ativa", statusCode: 404 };
-      }
-
-      if (account.phones.length < 0) {
-        throw { message: "Conta sem telefone", statusCode: 404 };
-      }
-
-      if (
-        account.authCode === null ||
-        (account.authCode &&
-          account.expiresAt &&
-          new Date() > account.expiresAt)
-      ) {
-        const { authCode, expiresAt } = generateCode();
-
-        await prismaClient.account.update({
-          where: { id: account.id },
-          data: {
-            authCode,
-            expiresAt,
-          },
-        });
-        const mail = new Mail()
-        await mail.sendEmail({
-          destination: account.email,
-          subject: "Código de autenticação WebApp-Eazy",
-          htmlContent: "Código de autenticação WebApp-Eazy: " + authCode,
-        })
-        // await whatsApiClient
-        //   .post("/Whatsapp/Api", {
-        //     code: account.phones[0].country_code,
-        //     numero: account.phones[0].phone,
-        //     text: "Código de autenticação WebApp-Eazy: " + authCode,
-        //   })
-        //   .then((response) => console.log("---"))
-        //   .catch((err) => console.log(err));
-      }
-
-      return {
-        name: account.name,
-        document: account.document,
-      };
-    } catch (error) {
-      console.log(error);
-      throw {
-        message: "Falhou pegar contas",
-        statusCode: 500,
-        details: error,
-      };
-    }
-  };
-
-  loginAccountSecondStep: AppAccountService.LoginAccountSecondStep.Handler =
-    async (authCode) => {
-      try {
-        const account = await prismaClient.account.findFirst({
-          where: { authCode },
-        });
-
-        if (!account) {
-          throw { message: "Conta não encontrada", statusCode: 404 };
-        }
-
-        if (account.expiresAt && new Date() > account.expiresAt) {
-          throw { message: "Código expirado!", statusCode: 401 };
-        }
-
-        const token = sign({}, String(process.env.SECRET_KEY), {
-          subject: String(account.id),
-          expiresIn: "24h", // 12 hours
-          algorithm: "HS512",
-        });
-
-        return {
-          token,
-          id: account.id,
-          name: account.name,
-          document: account.document,
-        };
-      } catch (error) {
-        throw {
-          message: "Falho etapa login!",
-          statusCode: 500,
-          details: error,
-        };
-      }
-    };
 }
 
 export default AccountService;

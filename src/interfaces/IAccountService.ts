@@ -35,37 +35,9 @@ export namespace AppAccountService {
     export type Handler = ServiceFn<Args, Promise<Result>>;
   }
 
-  export namespace LoginAccountFistStep {
-    export type Args = string;
-    export type Result =
-      | {
-          document: string;
-          name: string;
-        }
-      | null
-      | IError;
-    export type Handler = ServiceFn<Args, Promise<Result>>;
-  }
-
-  export namespace LoginAccountSecondStep {
-    export type Args = string;
-    export type Result =
-      | {
-          document: string;
-          name: string;
-          id: string;
-          token: string;
-        }
-      | null
-      | IError;
-    export type Handler = ServiceFn<Args, Promise<Result>>;
-  }
-
   export interface IAccountService {
     findAndCountAll: AppAccountService.GetAllAccountDTO.Handler;
     create: AppAccountService.Create.Handler;
     findByDocument: AppAccountService.FindByDocument.Handler;
-    loginAccountFistStep: AppAccountService.LoginAccountFistStep.Handler;
-    loginAccountSecondStep: AppAccountService.LoginAccountSecondStep.Handler;
   }
 }
