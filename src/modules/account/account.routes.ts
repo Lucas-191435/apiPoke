@@ -30,19 +30,6 @@ routes.get("/accountByDocument",
   accountController.accountByDocument(req, res)
 );
 
-routes.get(
-  "/accountByToken",
-  valideteAccountToken,
-  (req: Request, res: Response) => accountController.accountByToken(req, res)
-);
-
-routes.post("/loginAccountFistStep", (req: Request, res: Response) =>
-  accountController.loginAccountFistStep(req, res)
-);
-
-routes.post("/loginAccountSecondStep", (req: Request, res: Response) =>
-  accountController.loginAccountSecondStep(req, res)
-);
 
 
 routes.post("/testeInteracao", (req: Request, res: Response) =>

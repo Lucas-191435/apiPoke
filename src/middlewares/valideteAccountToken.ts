@@ -28,8 +28,8 @@ const valideteAccountToken = async (
       String(process.env.SECRET_KEY)
     ) as IJwtPayload;
 
-    const account = await prismaClient.account.findFirst({ where: { id } });
-    res.user = account?.id;
+    const user = await prismaClient.user.findFirst({ where: { id } });
+    res.user = user?.id;
 
     return next();
   } catch {
