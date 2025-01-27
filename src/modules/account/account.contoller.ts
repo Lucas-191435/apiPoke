@@ -67,54 +67,8 @@ class AccountController {
     }
   }
 
-  async accountByToken(req: Request, res: any): Promise<Response> {
-    try {
-      const userId = res.user;
 
-      let accounts = await this.accountService.findByToken(userId as string);
 
-      return res.status(201).json({ message: "Contas", data: accounts });
-    } catch (error) {
-      const err = error as IError;
-      return res
-        .status(err.statusCode || 500)
-        .json({ message: err.message, details: err.details });
-    }
-  }
-
-  async loginAccountFistStep(req: Request, res: Response): Promise<Response> {
-    try {
-      const { document } = req.body;
-
-      let accounts = await this.accountService.loginAccountFistStep(
-        document as string
-      );
-
-      return res.status(201).json({ message: "Conta", data: accounts });
-    } catch (error) {
-      const err = error as IError;
-      return res
-        .status(err.statusCode || 500)
-        .json({ message: err.message, details: err.details });
-    }
-  }
-
-  async loginAccountSecondStep(req: Request, res: Response): Promise<Response> {
-    try {
-      const { authCode } = req.body;
-
-      let accounts = await this.accountService.loginAccountSecondStep(
-        authCode as string
-      );
-
-      return res.status(201).json({ message: "Conta", data: accounts });
-    } catch (error) {
-      const err = error as IError;
-      return res
-        .status(err.statusCode || 500)
-        .json({ message: err.message, details: err.details });
-    }
-  }
 
   async testeInteracao(req: Request, res: Response): Promise<any> {
     try {
